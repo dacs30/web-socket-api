@@ -1,4 +1,6 @@
 import WebSocket from 'ws';
+import RequestHandler from './handlers/RequestHandler';
+import { MessageHandler } from './handlers';
 
 const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';
 
@@ -17,10 +19,11 @@ const server = new WebSocket.Server({
 server.on('connection', (socket) => {
   console.log('Client connected');
 
-  socket.on('message', (message) => {
-    console.log(`Received: ${message}`);
-    socket.send(`Echo: ${message}`);
-  });
+  // Create an instance of RequestHandler for each connection
+  new RequestHandler(
+    (handler: MessageHandler) => socket.on('message', (data: WebSocket.RawData) => handler(data.toString())),
+    (message: string) => socket.send(message)
+  );
 
   socket.on('close', () => {
     console.log('Client disconnected');
