@@ -1,24 +1,73 @@
 import WebSocket from 'ws';
+import jwt from 'jsonwebtoken';
+import http from 'http';
 import RequestHandler from './handlers/RequestHandler';
+import url from 'url';
 
-const allowedOrigin = process.env.ALLOWED_ORIGIN || 'http://localhost:3000';
+declare module 'http' {
+  interface IncomingMessage {
+    user?: any;
+  }
+}
 
-const server = new WebSocket.Server({
-  port: 8080,
-  verifyClient: (info, done) => {
-    console.log(`Origin: ${info.origin}`);
-    if (info.origin === allowedOrigin) {
-      done(true);
+// Secret key for JWT
+const secretKey = 'your_secret_key';
+
+// Create an HTTP server to serve the WebSocket server
+// and provide a way to generate JWTs
+const server = http.createServer((req, res) => {
+  if (!req.url) {
+    res.writeHead(400, { 'Content-Type': 'text/plain' });
+    res.end('Bad Request');
+    return;
+  }
+  const parsedUrl = url.parse(req.url, true);
+  if (parsedUrl.pathname === '/get-token' && req.method === 'GET') {
+    const { username } = parsedUrl.query;
+    if (username) {
+      const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
+      res.writeHead(200, { 'Content-Type': 'application/json' });
+      res.end(JSON.stringify({ token }));
     } else {
-      done(false, 403, 'Forbidden');
+      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.end('Missing username parameter');
     }
+  } else {
+    res.writeHead(404, { 'Content-Type': 'text/plain' });
+    res.end('Not Found');
   }
 });
 
-server.on('connection', (socket: WebSocket) => {
-  console.log('Client connected');
+// Create a WebSocket server from the server
+const wss = new WebSocket.Server({ server });
 
-  new RequestHandler(socket);
+// Middleware to verify JWT
+wss.on('headers', (_headers, req) => {
+  const token = req.headers['sec-websocket-protocol'];
+  if (token) {
+    try {
+      const decoded = jwt.verify(token, secretKey);
+      req.user = decoded;
+    } catch (err) {
+      console.log('Invalid token');
+    }
+  } 
 });
 
-console.log(`WebSocket server is running on ${allowedOrigin}`);
+wss.on('connection', (ws, req) => {
+  if (!req.user) {
+    ws.close(1008, 'Unauthorized');
+    return;
+  }
+
+  new RequestHandler(ws);
+});
+
+// Generate a JWT for demonstration purposes
+const token = jwt.sign({ username: 'user1' }, secretKey, { expiresIn: '1h' });
+console.log(`Generated JWT: ${token}`);
+
+// Start the server
+server.listen(8080, () => {
+  console.log('Server running at http://localhost:8080/');
+});
