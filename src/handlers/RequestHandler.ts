@@ -1,19 +1,20 @@
-import { BaseRequestHandler, OnMessage, Send } from "./IRequestHandler";
+import { BaseRequestHandler } from "./IRequestHandler";
+import WebSocket from 'ws';
 
 class RequestHandler implements BaseRequestHandler {
-  private onMessage: OnMessage;
-  private send: Send;
+  private socket: WebSocket;
 
-  constructor(onMessage: OnMessage, send: Send) {
-    this.onMessage = onMessage;
-    this.send = send;
-
-    // Bind the handleMessage method to the current instance
-    this.handleMessage = this.handleMessage.bind(this);
-
-    // Attach the message handler
-    this.onMessage(this.handleMessage);
+  constructor(socket: WebSocket) {
+    this.socket = socket;
+    this.socket.addEventListener("message", (event) => this.handleMessage(event.data.toString()));
+    this.socket.addEventListener("close", () => console.log("Client disconnected"));
+    this.socket.addEventListener("error", (err) => console.error(err));
+    this.socket.addEventListener("open", (message) => console.log("Client connected", message));
   }
+
+  // handleOpen() {
+  //   console.log("Client connected");
+  // }
 
   handleRequest(req: string): void {
     throw new Error("Method not implemented");
@@ -21,7 +22,7 @@ class RequestHandler implements BaseRequestHandler {
 
   handleMessage(req: string) {
     console.log(`Received: ${req}`);
-    this.send(`Echo: ${req}`);
+    this.socket.send(`Echo: ${req}`);
   }
 }
 
