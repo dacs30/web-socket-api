@@ -54,3 +54,10 @@ sequenceDiagram
 ```
 
 You can modify the `RequestHandler` class to handle the messages as you wish. Or even turn that into a factory to instantiate different handlers for different types of clients. The idea is that the handlers are responsible for the business logic of the application. They can process the messages, send messages to other clients, or even trigger events in other services like LLMs.
+
+
+## Next steps
+
+- Implement a more robust JWT verification
+- Implement a more robust message handling system
+- Implement an SDK that holds defined types of messages that could be shared between the client and the server
