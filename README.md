@@ -23,6 +23,7 @@ _run from the root directory_
 ```javascript
 const ws = new WebSocket('ws://localhost:8080');
 ```
+_when in production, use the servers address_
 
 ## General structure
 
