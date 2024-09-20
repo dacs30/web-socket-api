@@ -12,10 +12,6 @@ class RequestHandler implements BaseRequestHandler {
     this.socket.addEventListener("open", (message) => console.log("Client connected", message));
   }
 
-  // handleOpen() {
-  //   console.log("Client connected");
-  // }
-
   handleRequest(req: string): void {
     throw new Error("Method not implemented");
   }
