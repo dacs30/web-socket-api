@@ -16,6 +16,19 @@ const secretKey = 'your_secret_key';
 // Create an HTTP server to serve the WebSocket server
 // and provide a way to generate JWTs
 const server = http.createServer((req, res) => {
+  // Enable CORS
+  // Set CORS headers for all responses
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
   if (!req.url) {
     res.writeHead(400, { 'Content-Type': 'text/plain' });
     res.end('Bad Request');
