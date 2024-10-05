@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 import jwt from 'jsonwebtoken';
 import http from 'http';
-import RequestHandler from './handlers/RequestHandler';
+import RequestHandlerManager from './handlers/RequestHandlerManager';
 import url from 'url';
 
 declare module 'http' {
@@ -72,13 +72,8 @@ wss.on('connection', (ws, req) => {
     ws.close(1008, 'Unauthorized');
     return;
   }
-
-  new RequestHandler(ws);
+  new RequestHandlerManager(ws);
 });
-
-// Generate a JWT for demonstration purposes
-const token = jwt.sign({ username: 'user1' }, secretKey, { expiresIn: '1h' });
-console.log(`Generated JWT: ${token}`);
 
 // Start the server
 server.listen(8080, () => {

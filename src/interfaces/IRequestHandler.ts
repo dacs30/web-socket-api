@@ -1,5 +1,7 @@
+import WebSocket from "ws";
+
 export interface BaseRequestHandler {
-  handleRequest(req: string): void;
+  handleMessage(req: WebSocket.MessageEvent): void;
 }
 
 export type MessageHandler = (message: string) => void;

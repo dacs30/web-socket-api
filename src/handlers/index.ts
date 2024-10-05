@@ -1,1 +1,1 @@
-export * from "./IRequestHandler";
+export * from "../interfaces/IRequestHandler";

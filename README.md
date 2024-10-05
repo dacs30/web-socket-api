@@ -16,13 +16,15 @@ npm install
 ```bash
 npm start
 ```
+
 _run from the root directory_
 
 ### 3. Connect to the server
 
 ```javascript
-const ws = new WebSocket('ws://localhost:8080');
+const ws = new WebSocket("ws://localhost:8080");
 ```
+
 _when in production, use the servers address_
 
 ## General structure
@@ -32,7 +34,9 @@ sequenceDiagram
     participant Client
     participant HTTPServer
     participant WebSocketServer
-    participant RequestHandler
+    participant RequestHandlerManager
+    participant MessageHandlerFactory
+    participant MessageHandler
 
     Client->>HTTPServer: GET /get-token?username=user1
     HTTPServer-->>Client: 200 OK { token: "JWT" }
@@ -41,20 +45,20 @@ sequenceDiagram
     WebSocketServer->>WebSocketServer: Verify JWT
     WebSocketServer-->>Client: Connection Established
 
-    WebSocketServer->>RequestHandler: Instantiate RequestHandler(ws)
-    RequestHandler->>WebSocketServer: Add Event Listeners
+    WebSocketServer->>RequestHandlerManager: Instantiate RequestHandlerManager(ws)
+    RequestHandlerManager->>WebSocketServer: Add Event Listeners
 
-    Client->>RequestHandler: Send Message
-    RequestHandler->>RequestHandler: handleMessage(event.data)
-    RequestHandler->>Client: Echo: {message}
+    Client->>RequestHandlerManager: Send Message
+    RequestHandlerManager->>RequestHandlerManager: handleMessage(event.data)
+    RequestHandlerManager->>MessageHandlerFactory: createHandler(jsonReq.type, ws)
+    MessageHandlerFactory->>MessageHandler: Instantiate Appropriate Handler
+    MessageHandlerFactory-->>RequestHandlerManager: Return Handler
 
-    Client->>WebSocketServer: Close Connection
-    WebSocketServer->>RequestHandler: Trigger Close Event
-    RequestHandler->>RequestHandler: Log "Client disconnected"
+    RequestHandlerManager->>MessageHandler: handler.handle(jsonReq)
+    MessageHandler->>Client: Send Response
 ```
 
 You can modify the `RequestHandler` class to handle the messages as you wish. Or even turn that into a factory to instantiate different handlers for different types of clients. The idea is that the handlers are responsible for the business logic of the application. They can process the messages, send messages to other clients, or even trigger events in other services like LLMs.
-
 
 ## Next steps
 
