@@ -63,5 +63,12 @@ You can modify the `RequestHandler` class to handle the messages as you wish. Or
 ## Next steps
 
 - Implement a more robust JWT verification
-- Implement a more robust message handling system
+- Implement a more robust message handling system (maybe switching from WebSocket to Socket.io can make it easier)
 - Implement an SDK that holds defined types of messages that could be shared between the client and the server
+
+## Observations
+
+- This code is a simple example of a WebSocket server. It is not production-ready. For more robuts systems,
+consider using routing libraries that can help you create different sockets for different types of messages.
+- This code is not a full implementation of a JWT verification system. It is just a simple example of how you can use JWT to authenticate your clients. The client and the server need to share a key to generate and verify the JWT.
+- This code is not a full implementation of a message handling system. It is just a simple example of how you can use a factory to instantiate different handlers for different types of messages. You can create a more robust system that can handle different types of messages and different types of clients.
