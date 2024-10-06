@@ -28,7 +28,7 @@ _when in production, use the servers address_
 ### (extra) 4. Want to run in the client?
 
 I created a simple client that connects to the server and sends different types of messages. The client was built
-using Next js and has a simple UI that allows you to send messages to the server. Chedk the repo link below.
+using Next js and has a simple UI that allows you to send messages to the server. Check the repo link below.
 
 [WebSocket Client](https://github.com/dacs30/websocket-next-client)
 
